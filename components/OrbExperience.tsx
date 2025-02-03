@@ -97,10 +97,10 @@ export default function OrbExperience() {
         uniform vec2 mousePosition;
         uniform float scale;
         uniform float blobScale;
-        
+
         varying vec3 vNormal;
         varying vec2 vUv;
-        
+
         vec3 mod289(vec3 x)
         {
           return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -193,24 +193,24 @@ export default function OrbExperience() {
           float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
           return 2.2 * n_xyz;
         }
-        
+
         void main() {
           vNormal = normal;
           vUv = uv;
-          
+
           vec3 pos = position;
-          
+
           float noiseFreq = 2.0;
           float noiseAmp = 0.3;
           vec3 noisePos = vec3(pos.x * noiseFreq + time, pos.y * noiseFreq + time, pos.z * noiseFreq + time);
           float noise = cnoise(noisePos) * noiseAmp;
-          
+
           vec3 mouseOffset = vec3(mousePosition.x, mousePosition.y, 0.0);
           float dist = length(pos - mouseOffset);
           float mouseInfluence = 0.5 / (dist + 0.5);
-          
+
           pos += normal * (noise + mouseInfluence) * scale * blobScale;
-          
+
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
       `,
@@ -219,17 +219,17 @@ export default function OrbExperience() {
         varying vec2 vUv;
         uniform float time;
         uniform vec3 blobColor;
-        
+
         void main() {
           vec3 baseColor = blobColor;
           vec3 lightColor = baseColor + vec3(0.2, 0.1, 0.2);
           vec3 light = normalize(vec3(1.0, 1.0, 1.0));
           float diff = dot(vNormal, light) * 0.5 + 0.5;
-          
+
           vec3 color = mix(baseColor, lightColor, diff);
           float pulse = sin(time * 2.0) * 0.1 + 0.9;
           color *= pulse;
-          
+
           gl_FragColor = vec4(color, 0.92);
         }
       `,
@@ -496,7 +496,18 @@ export default function OrbExperience() {
 
   return (
     <div className="relative w-full h-full">
-      <div ref={containerRef} className="w-full h-full" />
+      <div 
+        ref={containerRef} 
+        className="w-full h-full touch-none select-none" 
+        style={{ 
+          WebkitTapHighlightColor: 'transparent',
+          WebkitTouchCallout: 'none',
+          WebkitUserSelect: 'none',
+          KhtmlUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
+        }} 
+      />
       <div className="fixed top-5 right-5 flex gap-2"></div>
       <div className="fixed bottom-5 right-5 flex gap-2">
         <HoverCard>
