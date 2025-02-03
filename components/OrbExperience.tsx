@@ -75,6 +75,7 @@ export default function OrbExperience() {
   const [blobColor, setBlobColor] = useState({ r: 0.2, g: 0.8, b: 0.4 });
   const ambientSoundRef = useRef<any>(null);
   const chirpIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const blobMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
 
   const createShaderMaterial = (color: { r: number, g: number, b: number }) => {
     return new THREE.ShaderMaterial({
@@ -302,16 +303,18 @@ export default function OrbExperience() {
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     containerRef.current.appendChild(renderer.domElement);
 
     const geometry = new THREE.SphereGeometry(1, 128, 128);
     const material = createShaderMaterial(blobColor);
+    blobMaterialRef.current = material;
 
     const blob = new THREE.Mesh(geometry, material);
     scene.add(blob);
 
     const particlesGeometry = new THREE.BufferGeometry();
-    const particleCount = 2000;
+    const particleCount = 1400;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
     const particleData = new Array(particleCount).fill(null).map(() => ({
@@ -364,17 +367,19 @@ export default function OrbExperience() {
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
 
-    let time = 0;
+    const clock = new THREE.Clock();
+
     function animate() {
       requestAnimationFrame(animate);
-      time += 0.01;
+      const delta = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
 
-      material.uniforms.time.value = time;
+      material.uniforms.time.value = elapsed;
       
       if (isClickingRef.current) {
-        blobScaleRef.current = Math.min(blobScaleRef.current + 0.01, 2.0);
+        blobScaleRef.current = Math.min(blobScaleRef.current + delta * 0.6, 2.0);
       } else {
-        blobScaleRef.current = Math.max(blobScaleRef.current - 0.01, 1.0);
+        blobScaleRef.current = Math.max(blobScaleRef.current - delta * 0.6, 1.0);
       }
       material.uniforms.blobScale.value = blobScaleRef.current;
 
@@ -402,12 +407,12 @@ export default function OrbExperience() {
             positions[i3 + 2] = (Math.random() - 0.5) * 2;
           }
         } else {
-          const angle = time * speed + offset;
-          const radius = 3 + Math.sin(time + offset) * 0.5;
+          const angle = elapsed * speed + offset;
+          const radius = 3 + Math.sin(elapsed + offset) * 0.5;
           
-          positions[i3] = Math.cos(angle) * radius + Math.sin(time * 0.5) * 0.2;
-          positions[i3 + 1] = Math.sin(angle) * radius + Math.cos(time * 0.5) * 0.2;
-          positions[i3 + 2] += Math.sin(time + offset) * 0.01;
+          positions[i3] = Math.cos(angle) * radius + Math.sin(elapsed * 0.5) * 0.2;
+          positions[i3 + 1] = Math.sin(angle) * radius + Math.cos(elapsed * 0.5) * 0.2;
+          positions[i3 + 2] += Math.sin(elapsed + offset) * 0.01 * delta;
           
           if (Math.abs(positions[i3 + 2]) > 2) {
             positions[i3 + 2] *= -0.8;
