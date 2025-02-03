@@ -364,24 +364,28 @@ export default function OrbExperience() {
 
     camera.position.z = 5;
 
-    const handleMouseMove = (event: MouseEvent) => {
-      mousePositionRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mousePositionRef.current.y =
-        -(event.clientY / window.innerHeight) * 2 + 1;
+    const handleMouseMove = (event: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in event ? event.touches[0].clientX : (event as MouseEvent).clientX;
+      const clientY = 'touches' in event ? event.touches[0].clientY : (event as MouseEvent).clientY;
+      mousePositionRef.current.x = (clientX / window.innerWidth) * 2 - 1;
+      mousePositionRef.current.y = -(clientY / window.innerHeight) * 2 + 1;
       material.uniforms.mousePosition.value = mousePositionRef.current;
     };
 
-    const handleMouseDown = () => {
+    const handleStart = () => {
       isClickingRef.current = true;
     };
 
-    const handleMouseUp = () => {
+    const handleEnd = () => {
       isClickingRef.current = false;
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mousedown", handleStart);
+    window.addEventListener("mouseup", handleEnd);
+    window.addEventListener("touchmove", handleMouseMove, { passive: true });
+    window.addEventListener("touchstart", handleStart, { passive: true });
+    window.addEventListener("touchend", handleEnd);
 
     const clock = new THREE.Clock();
 
@@ -459,8 +463,11 @@ export default function OrbExperience() {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mousedown", handleStart);
+      window.removeEventListener("mouseup", handleEnd);
+      window.removeEventListener("touchmove", handleMouseMove);
+      window.removeEventListener("touchstart", handleStart);
+      window.removeEventListener("touchend", handleEnd);
       window.removeEventListener("resize", handleResize);
 
       if (containerRef.current) {
