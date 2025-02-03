@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { Volume2, VolumeX, Timer, Sun, Moon, Palette } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useTheme } from 'next-themes';
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import { Volume2, VolumeX, Timer, Sun, Moon, Palette } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 import {
   Dialog,
   DialogContent,
@@ -22,41 +22,47 @@ import {
 const createBirdChirp = (audioContext: AudioContext, masterGain: GainNode) => {
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
-  
-  oscillator.type = 'sine';
+
+  oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(2000, audioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(1500, audioContext.currentTime + 0.1);
-  
+  oscillator.frequency.exponentialRampToValueAtTime(
+    1500,
+    audioContext.currentTime + 0.1,
+  );
+
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
   gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.05);
   gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
-  
+
   oscillator.connect(gainNode);
   gainNode.connect(masterGain);
-  
+
   oscillator.start();
   oscillator.stop(audioContext.currentTime + 0.1);
-  
+
   return { oscillator, gainNode };
 };
 
-const createAmbientSound = (audioContext: AudioContext, masterGain: GainNode) => {
+const createAmbientSound = (
+  audioContext: AudioContext,
+  masterGain: GainNode,
+) => {
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
   const filter = audioContext.createBiquadFilter();
-  
-  oscillator.type = 'sine';
+
+  oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-  
-  filter.type = 'lowpass';
+
+  filter.type = "lowpass";
   filter.frequency.setValueAtTime(800, audioContext.currentTime);
-  
+
   gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
-  
+
   oscillator.connect(filter);
   filter.connect(gainNode);
   gainNode.connect(masterGain);
-  
+
   return { oscillator, gainNode, filter };
 };
 
@@ -77,14 +83,14 @@ export default function OrbExperience() {
   const chirpIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const blobMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
 
-  const createShaderMaterial = (color: { r: number, g: number, b: number }) => {
+  const createShaderMaterial = (color: { r: number; g: number; b: number }) => {
     return new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
         mousePosition: { value: new THREE.Vector2(0, 0) },
         scale: { value: 1.0 },
         blobScale: { value: 1.0 },
-        blobColor: { value: new THREE.Vector3(color.r, color.g, color.b) }
+        blobColor: { value: new THREE.Vector3(color.r, color.g, color.b) },
       },
       vertexShader: `
         uniform float time;
@@ -227,16 +233,17 @@ export default function OrbExperience() {
           gl_FragColor = vec4(color, 0.92);
         }
       `,
-      transparent: true
+      transparent: true,
     });
   };
 
   const toggleAudio = () => {
     if (!audioEnabled) {
       try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext ||
+          (window as any).webkitAudioContext)();
         audioContextRef.current = audioContext;
-        
+
         const masterGain = audioContext.createGain();
         masterGain.gain.value = 0.3;
         masterGain.connect(audioContext.destination);
@@ -249,13 +256,13 @@ export default function OrbExperience() {
 
         // Schedule random bird chirps
         chirpIntervalRef.current = setInterval(() => {
-          if (Math.random() < 0.3) { // 30% chance of chirp every interval
+          if (Math.random() < 0.3) {
+            // 30% chance of chirp every interval
             createBirdChirp(audioContext, masterGain);
           }
         }, 1000);
-
       } catch (error) {
-        console.error('Audio initialization failed:', error);
+        console.error("Audio initialization failed:", error);
         return;
       }
     } else {
@@ -293,14 +300,19 @@ export default function OrbExperience() {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -319,29 +331,32 @@ export default function OrbExperience() {
     const velocities = new Float32Array(particleCount * 3);
     const particleData = new Array(particleCount).fill(null).map(() => ({
       speed: Math.random() * 0.02 + 0.01,
-      offset: Math.random() * Math.PI * 2
+      offset: Math.random() * Math.PI * 2,
     }));
 
     for (let i = 0; i < particleCount * 3; i += 3) {
       const angle = Math.random() * Math.PI * 2;
       const radius = 3 + Math.random() * 3;
-      
+
       positions[i] = Math.cos(angle) * radius;
       positions[i + 1] = Math.sin(angle) * radius;
       positions[i + 2] = (Math.random() - 0.5) * 2;
-      
+
       velocities[i] = (Math.random() - 0.5) * 0.01;
       velocities[i + 1] = (Math.random() - 0.5) * 0.01;
       velocities[i + 2] = (Math.random() - 0.5) * 0.01;
     }
 
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    
+    particlesGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(positions, 3),
+    );
+
     const particlesMaterial = new THREE.PointsMaterial({
       color: 0x88ff88,
       size: 0.05,
       transparent: true,
-      opacity: 0.6
+      opacity: 0.6,
     });
 
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -351,7 +366,8 @@ export default function OrbExperience() {
 
     const handleMouseMove = (event: MouseEvent) => {
       mousePositionRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mousePositionRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      mousePositionRef.current.y =
+        -(event.clientY / window.innerHeight) * 2 + 1;
       material.uniforms.mousePosition.value = mousePositionRef.current;
     };
 
@@ -363,9 +379,9 @@ export default function OrbExperience() {
       isClickingRef.current = false;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
 
     const clock = new THREE.Clock();
 
@@ -375,11 +391,17 @@ export default function OrbExperience() {
       const elapsed = clock.getElapsedTime();
 
       material.uniforms.time.value = elapsed;
-      
+
       if (isClickingRef.current) {
-        blobScaleRef.current = Math.min(blobScaleRef.current + delta * 0.6, 2.0);
+        blobScaleRef.current = Math.min(
+          blobScaleRef.current + delta * 0.6,
+          2.0,
+        );
       } else {
-        blobScaleRef.current = Math.max(blobScaleRef.current - delta * 0.6, 1.0);
+        blobScaleRef.current = Math.max(
+          blobScaleRef.current - delta * 0.6,
+          1.0,
+        );
       }
       material.uniforms.blobScale.value = blobScaleRef.current;
 
@@ -391,14 +413,14 @@ export default function OrbExperience() {
         const x = positions[i3];
         const y = positions[i3 + 1];
         const z = positions[i3 + 2];
-        
+
         const distanceToCenter = Math.sqrt(x * x + y * y + z * z);
-        
+
         if (isClickingRef.current && distanceToCenter < 5) {
           positions[i3] += (-x / distanceToCenter) * speed * 2;
           positions[i3 + 1] += (-y / distanceToCenter) * speed * 2;
           positions[i3 + 2] += (-z / distanceToCenter) * speed * 2;
-          
+
           if (distanceToCenter < 1.5) {
             const angle = Math.random() * Math.PI * 2;
             const radius = 4 + Math.random();
@@ -409,11 +431,13 @@ export default function OrbExperience() {
         } else {
           const angle = elapsed * speed + offset;
           const radius = 3 + Math.sin(elapsed + offset) * 0.5;
-          
-          positions[i3] = Math.cos(angle) * radius + Math.sin(elapsed * 0.5) * 0.2;
-          positions[i3 + 1] = Math.sin(angle) * radius + Math.cos(elapsed * 0.5) * 0.2;
+
+          positions[i3] =
+            Math.cos(angle) * radius + Math.sin(elapsed * 0.5) * 0.2;
+          positions[i3 + 1] =
+            Math.sin(angle) * radius + Math.cos(elapsed * 0.5) * 0.2;
           positions[i3 + 2] += Math.sin(elapsed + offset) * 0.01 * delta;
-          
+
           if (Math.abs(positions[i3 + 2]) > 2) {
             positions[i3 + 2] *= -0.8;
           }
@@ -430,19 +454,19 @@ export default function OrbExperience() {
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     animate();
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('resize', handleResize);
-      
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("resize", handleResize);
+
       if (containerRef.current) {
         containerRef.current.removeChild(renderer.domElement);
       }
-      
+
       geometry.dispose();
       material.dispose();
       particlesGeometry.dispose();
@@ -466,27 +490,10 @@ export default function OrbExperience() {
   return (
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
-      <div className="fixed top-5 right-5 flex gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
-      </div>
+      <div className="fixed top-5 right-5 flex gap-2"></div>
       <div className="fixed bottom-5 right-5 flex gap-2">
         <HoverCard>
-          <HoverCardTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
-            >
-              <Palette className="h-4 w-4" />
-            </Button>
-          </HoverCardTrigger>
+          <HoverCardTrigger asChild></HoverCardTrigger>
           <HoverCardContent className="w-80">
             <div className="space-y-4">
               <h4 className="text-sm font-semibold">Blob Color</h4>
@@ -496,7 +503,9 @@ export default function OrbExperience() {
                     <label className="text-sm">Red</label>
                     <Slider
                       value={[blobColor.r * 100]}
-                      onValueChange={(value) => setBlobColor(prev => ({ ...prev, r: value[0] / 100 }))}
+                      onValueChange={(value) =>
+                        setBlobColor((prev) => ({ ...prev, r: value[0] / 100 }))
+                      }
                       max={100}
                       step={1}
                       className="w-[60%]"
@@ -506,7 +515,9 @@ export default function OrbExperience() {
                     <label className="text-sm">Green</label>
                     <Slider
                       value={[blobColor.g * 100]}
-                      onValueChange={(value) => setBlobColor(prev => ({ ...prev, g: value[0] / 100 }))}
+                      onValueChange={(value) =>
+                        setBlobColor((prev) => ({ ...prev, g: value[0] / 100 }))
+                      }
                       max={100}
                       step={1}
                       className="w-[60%]"
@@ -516,7 +527,9 @@ export default function OrbExperience() {
                     <label className="text-sm">Blue</label>
                     <Slider
                       value={[blobColor.b * 100]}
-                      onValueChange={(value) => setBlobColor(prev => ({ ...prev, b: value[0] / 100 }))}
+                      onValueChange={(value) =>
+                        setBlobColor((prev) => ({ ...prev, b: value[0] / 100 }))
+                      }
                       max={100}
                       step={1}
                       className="w-[60%]"
@@ -527,26 +540,10 @@ export default function OrbExperience() {
             </div>
           </HoverCardContent>
         </HoverCard>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
-          onClick={toggleAudio}
-        >
-          {audioEnabled ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        </Button>
       </div>
       <div className="fixed bottom-5 left-5">
         <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
-            >
-              <Timer className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
+          <DialogTrigger asChild></DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Set Relaxation Timer</DialogTitle>
