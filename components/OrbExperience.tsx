@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Volume2, VolumeX, Timer, Sun, Moon, Palette } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import {
