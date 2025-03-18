@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
@@ -5,6 +6,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: { unoptimized: true },
+  experimental: {
+    appDir: true,
+  },
+  serverRuntimeConfig: {
+    PORT: 3004,
+  },
 };
 
 module.exports = nextConfig;
