@@ -508,7 +508,27 @@ export default function OrbExperience() {
   const [showInstructions, setShowInstructions] = useState(true);
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
   const [showCongrats, setShowCongrats] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      if (isMuted) {
+        audioRef.current.volume = volume;
+      } else {
+        audioRef.current.volume = 0;
+      }
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleVolumeChange = (value: number) => {
+    setVolume(value);
+    if (audioRef.current && !isMuted) {
+      audioRef.current.volume = value;
+    }
+  };
 
   useEffect(() => {
     const audio = new Audio("/natural-song-of-birds.mp3");
@@ -580,7 +600,19 @@ export default function OrbExperience() {
         }} 
       />
       <div className="fixed top-5 right-5 flex gap-2"></div>
-      <div className="fixed bottom-5 right-5 flex gap-2">
+      <div className="fixed bottom-5 right-5 flex gap-4 items-center">
+        <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm p-2 rounded-lg">
+          <button onClick={toggleMute} className="text-black/70 hover:text-black/90 transition-colors">
+            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+          </button>
+          <Slider
+            value={[volume * 100]}
+            onValueChange={(value) => handleVolumeChange(value[0] / 100)}
+            max={100}
+            step={1}
+            className="w-[100px]"
+          />
+        </div>
         <HoverCard>
           <HoverCardTrigger asChild></HoverCardTrigger>
           <HoverCardContent className="w-80">
