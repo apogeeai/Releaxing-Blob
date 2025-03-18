@@ -328,7 +328,7 @@ export default function OrbExperience() {
     const particleCount = 1000;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
-    
+
     const particlesGeometry = new THREE.BufferGeometry();
     particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
@@ -591,6 +591,7 @@ export default function OrbExperience() {
         ref={containerRef} 
         className="w-full h-full touch-none select-none" 
         style={{ 
+          cursor: 'pointer',
           WebkitTapHighlightColor: 'transparent',
           WebkitTouchCallout: 'none',
           WebkitUserSelect: 'none',
