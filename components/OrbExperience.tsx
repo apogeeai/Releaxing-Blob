@@ -500,7 +500,7 @@ export default function OrbExperience() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    
+
     if (isClickingRef.current && !showCongrats) {
       setShowInstructions(false);
       setHoldTimer(120);
