@@ -318,7 +318,7 @@ export default function OrbExperience() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     containerRef.current.appendChild(renderer.domElement);
 
-    const geometry = new THREE.SphereGeometry(1, 128, 128);
+    const geometry = new THREE.SphereGeometry(1, 64, 64);
     const material = createShaderMaterial(blobColor);
     blobMaterialRef.current = material;
 
@@ -326,7 +326,9 @@ export default function OrbExperience() {
     scene.add(blob);
 
     const particlesGeometry = new THREE.BufferGeometry();
-    const particleCount = 1400;
+    particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
+    const particleCount = 1000;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
     const particleData = new Array(particleCount).fill(null).map(() => ({
@@ -537,8 +539,16 @@ export default function OrbExperience() {
         </div>
       )}
       {showCongrats && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-8 py-4 rounded-lg">
-          Congratulations!
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="text-3xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-8 py-4 rounded-lg mb-4">
+            Congratulations!
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-white/30 backdrop-blur-sm px-6 py-2 rounded-lg text-black/70 hover:bg-white/40 transition-all"
+          >
+            Try Again
+          </button>
         </div>
       )}
       <div 
