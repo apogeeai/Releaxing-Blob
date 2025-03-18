@@ -325,12 +325,13 @@ export default function OrbExperience() {
     const blob = new THREE.Mesh(geometry, material);
     scene.add(blob);
 
-    const particlesGeometry = new THREE.BufferGeometry();
-    particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
     const particleCount = 1000;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
+    
+    const particlesGeometry = new THREE.BufferGeometry();
+    particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
     const particleData = new Array(particleCount).fill(null).map(() => ({
       speed: Math.random() * 0.02 + 0.01,
       offset: Math.random() * Math.PI * 2,
