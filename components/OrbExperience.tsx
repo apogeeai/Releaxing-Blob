@@ -494,8 +494,52 @@ export default function OrbExperience() {
     };
   }, []);
 
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [holdTimer, setHoldTimer] = useState<number | null>(null);
+  const [showCongrats, setShowCongrats] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (isClickingRef.current && !showCongrats) {
+      setShowInstructions(false);
+      setHoldTimer(120);
+      interval = setInterval(() => {
+        setHoldTimer((prev) => {
+          if (prev === null || prev <= 1) {
+            setShowCongrats(true);
+            clearInterval(interval!);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (!isClickingRef.current && !showCongrats) {
+      setHoldTimer(null);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isClickingRef.current, showCongrats]);
+
   return (
     <div className="relative w-full h-full">
+      {showInstructions && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg">
+          Click and Hold Object to Begin!
+        </div>
+      )}
+      {holdTimer !== null && (
+        <div className="fixed top-5 right-5 text-xl font-bold bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg">
+          {Math.floor(holdTimer / 60)}:{(holdTimer % 60).toString().padStart(2, '0')}
+        </div>
+      )}
+      {showCongrats && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-8 py-4 rounded-lg">
+          Congratulations!
+        </div>
+      )}
       <div 
         ref={containerRef} 
         className="w-full h-full touch-none select-none" 
