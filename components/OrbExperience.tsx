@@ -374,6 +374,7 @@ export default function OrbExperience() {
 
     const handleStart = () => {
       isClickingRef.current = true;
+      setShowInstructions(false);
     };
 
     const handleEnd = () => {
