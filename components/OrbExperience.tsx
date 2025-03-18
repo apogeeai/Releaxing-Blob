@@ -378,10 +378,17 @@ export default function OrbExperience() {
     const handleStart = () => {
       isClickingRef.current = true;
       setShowInstructions(false);
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
     };
 
     const handleEnd = () => {
       isClickingRef.current = false;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -501,6 +508,13 @@ export default function OrbExperience() {
   const [showInstructions, setShowInstructions] = useState(true);
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
   const [showCongrats, setShowCongrats] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio("/natural-song-of-birds.mp3");
+    audio.loop = true;
+    audioRef.current = audio;
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -531,7 +545,7 @@ export default function OrbExperience() {
   return (
     <div className="relative w-full h-full">
       {showInstructions && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg cursor-pointer">
           Click and Hold Object to Begin!
         </div>
       )}
