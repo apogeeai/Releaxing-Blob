@@ -82,8 +82,6 @@ export default function OrbExperience() {
   const ambientSoundRef = useRef<any>(null);
   const chirpIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const blobMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
 
   const createShaderMaterial = (color: { r: number; g: number; b: number }) => {
     return new THREE.ShaderMaterial({
@@ -330,7 +328,7 @@ export default function OrbExperience() {
     const particleCount = 1000;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
-
+    
     const particlesGeometry = new THREE.BufferGeometry();
     particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
@@ -380,28 +378,10 @@ export default function OrbExperience() {
     const handleStart = () => {
       isClickingRef.current = true;
       setShowInstructions(false);
-      if (audioRef.current) {
-        audioRef.current.volume = 0;
-        audioRef.current.play();
-        audioRef.current.volume = 1;
-      }
     };
 
     const handleEnd = () => {
       isClickingRef.current = false;
-      if (audioRef.current) {
-        const fadeOut = setInterval(() => {
-          if (audioRef.current && audioRef.current.volume > 0.1) {
-            audioRef.current.volume -= 0.1;
-          } else {
-            if (audioRef.current) {
-              audioRef.current.pause();
-              audioRef.current.currentTime = 0;
-            }
-            clearInterval(fadeOut);
-          }
-        }, 50);
-      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -546,12 +526,6 @@ export default function OrbExperience() {
       if (interval) clearInterval(interval);
     };
   }, [isClickingRef.current, showCongrats]);
-
-  useEffect(() => {
-    const audio = new Audio("/public/natural-song-of-birds.mp3");
-    audio.loop = true;
-    audioRef.current = audio;
-  }, []);
 
   return (
     <div className="relative w-full h-full">
