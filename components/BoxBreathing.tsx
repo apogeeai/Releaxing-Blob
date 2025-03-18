@@ -21,8 +21,8 @@ const BoxBreathing = ({ isPressed }: { isPressed: boolean }) => {
     ctx.clearRect(0, 0, size, size);
     
     // Set up styles
-    ctx.strokeStyle = '#4dd37b';
-    ctx.fillStyle = '#4dd37b';
+    ctx.strokeStyle = '#fde682';
+    ctx.fillStyle = '#fde682';
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -78,8 +78,8 @@ const BoxBreathing = ({ isPressed }: { isPressed: boolean }) => {
     
     // Draw gradient trail
     const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
-    gradient.addColorStop(0, 'rgba(77, 211, 123, 0.1)');
-    gradient.addColorStop(1, 'rgba(77, 211, 123, 0.8)');
+    gradient.addColorStop(0, 'rgba(253, 230, 130, 0.1)');
+    gradient.addColorStop(1, 'rgba(253, 230, 130, 0.8)');
     ctx.strokeStyle = gradient;
     ctx.beginPath();
     ctx.moveTo(startX, startY);
@@ -87,7 +87,7 @@ const BoxBreathing = ({ isPressed }: { isPressed: boolean }) => {
     ctx.stroke();
     
     // Reset stroke style for remaining drawings
-    ctx.strokeStyle = '#4dd37b';
+    ctx.strokeStyle = '#fde682';
 
     // Draw dot instead of arrow
     ctx.beginPath();
