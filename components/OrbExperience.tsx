@@ -18,6 +18,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import BoxBreathing from "./BoxBreathing";
 
 const createBirdChirp = (audioContext: AudioContext, masterGain: GainNode) => {
   const oscillator = audioContext.createOscillator();
@@ -230,7 +231,7 @@ export default function OrbExperience() {
           float pulse = sin(time * 2.0) * 0.1 + 0.9;
           color *= pulse;
 
-          gl_FragColor = vec4(color, 0.92);
+          gl_FragColor = vec4(color, 0.7);
         }
       `,
       transparent: true,
@@ -359,7 +360,7 @@ export default function OrbExperience() {
       color: 0x88ff88,
       size: 0.05,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.7,
     });
 
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -579,20 +580,21 @@ export default function OrbExperience() {
 
   return (
     <div 
-      className="relative w-full h-full cursor-pointer" 
+      className="relative w-full h-full cursor-pointer bg-[url('/meditation-orb-bg.jpg')] bg-cover bg-center" 
       onClick={() => {
         if (showCongrats) {
           window.location.reload();
         }
       }}
     >
+      <BoxBreathing isPressed={isClickingRef.current} />
       {showInstructions && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg cursor-pointer">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-[#4dd37b] bg-black/30 backdrop-blur-sm px-6 py-3 rounded-lg cursor-pointer">
           Click and Hold Object to Begin!
         </div>
       )}
       {holdTimer !== null && (
-        <div className="fixed top-5 right-5 text-xl font-bold bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg">
+        <div className="fixed top-5 right-5 text-xl font-bold text-[#4dd37b] bg-black/30 backdrop-blur-sm px-4 py-2 rounded-lg">
           {formatHoldTimer(holdTimer)}
         </div>
       )}
@@ -602,7 +604,7 @@ export default function OrbExperience() {
           onClick={() => window.location.reload()}
         >
           <div className="text-center">
-            <div className="text-3xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-8 py-4 rounded-lg mb-4">
+            <div className="text-3xl font-bold text-[#4dd37b] bg-black/30 backdrop-blur-sm px-8 py-4 rounded-lg mb-4">
               Congratulations!
             </div>
             <button 
@@ -610,7 +612,7 @@ export default function OrbExperience() {
                 e.stopPropagation();
                 window.location.reload();
               }} 
-              className="bg-white/30 backdrop-blur-sm px-6 py-2 rounded-lg text-black/70 hover:bg-white/40 transition-all"
+              className="bg-black/30 backdrop-blur-sm px-6 py-2 rounded-lg text-[#4dd37b] hover:bg-black/40 transition-all"
             >
               Try Again
             </button>
@@ -630,10 +632,9 @@ export default function OrbExperience() {
           msUserSelect: 'none'
         }} 
       />
-      <div className="fixed top-5 right-5 flex gap-2"></div>
       <div className="fixed bottom-5 right-5 flex gap-4 items-center">
-        <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm p-2 rounded-lg">
-          <button onClick={toggleMute} className="text-black/70 hover:text-black/90 transition-colors">
+        <div className="flex items-center gap-3 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-lg">
+          <button onClick={toggleMute} className="text-[#4dd37b] hover:text-[#4dd37b]/90 transition-colors">
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
           <Slider
@@ -648,11 +649,11 @@ export default function OrbExperience() {
           <HoverCardTrigger asChild></HoverCardTrigger>
           <HoverCardContent className="w-80">
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Blob Color</h4>
+              <h4 className="text-sm font-semibold text-[#4dd37b]">Blob Color</h4>
               <div className="grid gap-4">
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Red</label>
+                    <label className="text-sm text-[#4dd37b]">Red</label>
                     <Slider
                       value={[blobColor.r * 100]}
                       onValueChange={(value) =>
@@ -664,7 +665,7 @@ export default function OrbExperience() {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Green</label>
+                    <label className="text-sm text-[#4dd37b]">Green</label>
                     <Slider
                       value={[blobColor.g * 100]}
                       onValueChange={(value) =>
@@ -676,7 +677,7 @@ export default function OrbExperience() {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Blue</label>
+                    <label className="text-sm text-[#4dd37b]">Blue</label>
                     <Slider
                       value={[blobColor.b * 100]}
                       onValueChange={(value) =>
