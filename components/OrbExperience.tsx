@@ -376,8 +376,16 @@ export default function OrbExperience() {
     };
 
     const handleStart = () => {
+      if (showCongrats) {
+        // If clicking after congratulations, reset everything
+        window.location.reload();
+        return;
+      }
+      
       isClickingRef.current = true;
       setShowInstructions(false);
+      setShowCongrats(false);
+      setHoldTimer(120);
       if (audioRef.current) {
         audioRef.current.play();
       }
@@ -539,31 +547,45 @@ export default function OrbExperience() {
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (isClickingRef.current && !showCongrats) {
-      setShowInstructions(false);
-      setHoldTimer(120); // Reset to 2:00 minutes
+    if (isClickingRef.current) {
       if (interval) clearInterval(interval);
       interval = setInterval(() => {
         setHoldTimer((prev) => {
           if (prev === null || prev <= 1) {
             setShowCongrats(true);
             clearInterval(interval!);
-            return null;
+            return 0;
           }
           return prev - 1;
         });
       }, 1000);
-    } else if (!isClickingRef.current && !showCongrats) {
-      setHoldTimer(null);
+    } else if (!isClickingRef.current) {
+      if (interval) clearInterval(interval);
+      setHoldTimer(0); // Reset to 0:00 when not clicking
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isClickingRef.current, showCongrats]);
+  }, [isClickingRef.current]);
+
+  // Update the timer display format
+  const formatHoldTimer = (seconds: number | null) => {
+    if (seconds === null) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div className="relative w-full h-full">
+    <div 
+      className="relative w-full h-full cursor-pointer" 
+      onClick={() => {
+        if (showCongrats) {
+          window.location.reload();
+        }
+      }}
+    >
       {showInstructions && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg cursor-pointer">
           Click and Hold Object to Begin!
@@ -571,20 +593,28 @@ export default function OrbExperience() {
       )}
       {holdTimer !== null && (
         <div className="fixed top-5 right-5 text-xl font-bold bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg">
-          {Math.floor(holdTimer / 60)}:{(holdTimer % 60).toString().padStart(2, '0')}
+          {formatHoldTimer(holdTimer)}
         </div>
       )}
       {showCongrats && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <div className="text-3xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-8 py-4 rounded-lg mb-4">
-            Congratulations!
+        <div 
+          className="fixed inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm cursor-pointer"
+          onClick={() => window.location.reload()}
+        >
+          <div className="text-center">
+            <div className="text-3xl font-bold text-black/70 bg-white/30 backdrop-blur-sm px-8 py-4 rounded-lg mb-4">
+              Congratulations!
+            </div>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.reload();
+              }} 
+              className="bg-white/30 backdrop-blur-sm px-6 py-2 rounded-lg text-black/70 hover:bg-white/40 transition-all"
+            >
+              Try Again
+            </button>
           </div>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-white/30 backdrop-blur-sm px-6 py-2 rounded-lg text-black/70 hover:bg-white/40 transition-all"
-          >
-            Try Again
-          </button>
         </div>
       )}
       <div 
