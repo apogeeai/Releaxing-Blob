@@ -1,9 +1,10 @@
+
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({ weight: ['400', '700'], subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Relaxing Blob",
@@ -17,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={roboto.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

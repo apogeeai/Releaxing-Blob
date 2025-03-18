@@ -507,7 +507,8 @@ export default function OrbExperience() {
 
     if (isClickingRef.current && !showCongrats) {
       setShowInstructions(false);
-      setHoldTimer(120);
+      setHoldTimer(120); // Reset to 2:00 minutes
+      if (interval) clearInterval(interval);
       interval = setInterval(() => {
         setHoldTimer((prev) => {
           if (prev === null || prev <= 1) {
