@@ -95,15 +95,15 @@ const BoxBreathing = ({ isPressed }: { isPressed: boolean }) => {
     ctx.fill();
 
     // Draw text
-    const text = phases[phase].name;
-    ctx.font = 'bold 17px Inter';
+    ctx.font = 'bold 17px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(text, size/2, boxEnd + 22);
+    ctx.fillStyle = '#fde682';
+    ctx.fillText(phases[phase].name, size / 2, boxEnd + 22);
 
     // Draw countdown (reversed)
     const timeLeft = Math.ceil(phaseProgress * 4);
-    ctx.font = 'bold 34px Inter';
-    ctx.fillText(timeLeft.toString(), size/2, size/2 + 8);
+    ctx.font = 'bold 34px Arial, sans-serif';
+    ctx.fillText(timeLeft.toString(), size / 2, size / 2 + 8);
   };
 
   useEffect(() => {

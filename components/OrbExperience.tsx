@@ -231,6 +231,11 @@ export default function OrbExperience() {
           float pulse = sin(time * 2.0) * 0.1 + 0.9;
           color *= pulse;
 
+          // Add glow effect
+          float glow = pow(diff, 2.0);
+          vec3 glowColor = baseColor * 0.5;
+          color += glowColor * glow;
+
           gl_FragColor = vec4(color, 0.7);
         }
       `,
@@ -361,6 +366,8 @@ export default function OrbExperience() {
       size: 0.05,
       transparent: true,
       opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
 
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -369,6 +376,7 @@ export default function OrbExperience() {
     camera.position.z = 5;
 
     const handleMouseMove = (event: MouseEvent | TouchEvent) => {
+      event.preventDefault();
       const clientX = 'touches' in event ? event.touches[0].clientX : (event as MouseEvent).clientX;
       const clientY = 'touches' in event ? event.touches[0].clientY : (event as MouseEvent).clientY;
       mousePositionRef.current.x = (clientX / window.innerWidth) * 2 - 1;
@@ -376,9 +384,9 @@ export default function OrbExperience() {
       material.uniforms.mousePosition.value = mousePositionRef.current;
     };
 
-    const handleStart = () => {
+    const handleStart = (event: MouseEvent | TouchEvent) => {
+      event.preventDefault();
       if (showCongrats) {
-        // If clicking after congratulations, reset everything
         window.location.reload();
         return;
       }
@@ -392,20 +400,23 @@ export default function OrbExperience() {
       }
     };
 
-    const handleEnd = () => {
+    const handleEnd = (event: MouseEvent | TouchEvent) => {
+      event.preventDefault();
       isClickingRef.current = false;
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
+      setHoldTimer(null);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleStart);
-    window.addEventListener("mouseup", handleEnd);
-    window.addEventListener("touchmove", handleMouseMove, { passive: true });
-    window.addEventListener("touchstart", handleStart, { passive: true });
-    window.addEventListener("touchend", handleEnd);
+    window.addEventListener("mousemove", handleMouseMove, { passive: false });
+    window.addEventListener("mousedown", handleStart, { passive: false });
+    window.addEventListener("mouseup", handleEnd, { passive: false });
+    window.addEventListener("touchmove", handleMouseMove, { passive: false });
+    window.addEventListener("touchstart", handleStart, { passive: false });
+    window.addEventListener("touchend", handleEnd, { passive: false });
+    window.addEventListener("touchcancel", handleEnd, { passive: false });
 
     const clock = new THREE.Clock();
 
@@ -488,6 +499,7 @@ export default function OrbExperience() {
       window.removeEventListener("touchmove", handleMouseMove);
       window.removeEventListener("touchstart", handleStart);
       window.removeEventListener("touchend", handleEnd);
+      window.removeEventListener("touchcancel", handleEnd);
       window.removeEventListener("resize", handleResize);
 
       if (containerRef.current) {
@@ -580,17 +592,48 @@ export default function OrbExperience() {
 
   return (
     <div 
-      className="relative w-full h-full cursor-pointer bg-[url('/meditation-orb-bg.jpg')] bg-cover bg-center" 
+      className="relative w-full h-full cursor-pointer" 
       onClick={() => {
         if (showCongrats) {
           window.location.reload();
         }
       }}
+      onContextMenu={(e) => e.preventDefault()}
+      onTouchStart={(e) => e.preventDefault()}
+      onTouchMove={(e) => e.preventDefault()}
+      onTouchEnd={(e) => e.preventDefault()}
+      style={{
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        KhtmlUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none',
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'none',
+        backgroundImage: 'url("/meditation-orb-bg.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        position: 'relative',
+        backgroundColor: '#FFFFFF'
+      }}
     >
+      <div 
+        className="absolute inset-0 bg-black/20"
+        style={{
+          pointerEvents: 'none'
+        }}
+      />
       <BoxBreathing isPressed={isClickingRef.current} />
       {showInstructions && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-[#fde682] bg-black/30 backdrop-blur-sm px-6 py-3 rounded-lg cursor-pointer">
-          Click and Hold Object to Begin!
+        <div
+          className={`fixed left-1/2 -translate-x-1/2 bottom-5 md:top-1/2 md:-translate-y-1/2 text-white/80 md:text-[#fde682] text-lg md:text-xl font-medium transition-all duration-300 text-center bg-black/30 backdrop-blur-sm px-4 h-[70px] flex items-center rounded-lg ${
+            isClickingRef.current ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ pointerEvents: "none" }}
+        >
+          Click and Hold the Orb to Begin!
         </div>
       )}
       {holdTimer !== null && (
@@ -629,7 +672,10 @@ export default function OrbExperience() {
           WebkitUserSelect: 'none',
           KhtmlUserSelect: 'none',
           MozUserSelect: 'none',
-          msUserSelect: 'none'
+          msUserSelect: 'none',
+          userSelect: 'none',
+          touchAction: 'none',
+          pointerEvents: 'none'
         }} 
       />
       <div className="fixed bottom-5 right-5 flex gap-4 items-center">

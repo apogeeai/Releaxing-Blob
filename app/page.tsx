@@ -6,7 +6,7 @@ const OrbExperience = dynamic(() => import('@/components/OrbExperience'), {
 
 export default function Home() {
   return (
-    <main className="w-full h-screen bg-[#e8f5e9]">
+    <main className="w-full h-screen bg-white">
       <OrbExperience />
     </main>
   );
